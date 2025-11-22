@@ -1,0 +1,58 @@
+/* GLOBAL */
+:root{
+  --bg-yellow:#fff8c0;
+  --accent:#ffd84d;
+  --accent-dark:#e6c33f;
+  --blue:#0f3c64;
+  --card:#ffffff;
+  --muted:#666;
+  --radius:12px;
+  font-family: "Poppins", sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg-yellow);color:var(--blue);font-family:inherit}
+
+/* LOGIN */
+.login-bg{display:flex;align-items:center;justify-content:center;height:100vh}
+.login-wrap{width:100%;max-width:420px;padding:18px}
+.login-card{background:var(--card);border-radius:18px;padding:26px;box-shadow:0 10px 30px rgba(15,60,100,0.12);text-align:center}
+.login-logo{width:88px;height:auto;margin-bottom:12px}
+.login-header{font-size:20px;margin:0 0 12px 0}
+.login-card input{width:100%;padding:12px;margin:10px 0;border-radius:10px;border:1px solid #e7e2d5;font-size:15px}
+.btn{display:inline-block;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+.btn.primary{background:var(--accent);color:#2b2200}
+.btn.danger{background:#ff6666;color:#fff}
+.btn.small{padding:6px 10px;font-size:13px;border-radius:8px;border:none;cursor:pointer}
+.link-like{color:var(--blue);cursor:pointer;text-decoration:underline}
+.small{font-size:13px;color:var(--muted);margin-top:10px}
+
+/* APP TOP */
+.app-top{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:linear-gradient(90deg,var(--accent),var(--accent-dark));box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+.app-logo{width:56px;height:auto;border-radius:8px;box-shadow:0 6px 14px rgba(0,0,0,0.08)}
+.brand{font-size:20px;font-weight:700;margin-left:10px;color:#2b2200}
+.left{display:flex;align-items:center}
+.right{display:flex;align-items:center;gap:12px;color:#2b2200}
+
+/* LAYOUT */
+.app-main{display:flex;gap:18px;padding:20px}
+.sidebar{width:180px}
+.panel{flex:1;background:var(--card);padding:18px;border-radius:12px;box-shadow:0 10px 30px rgba(15,60,100,0.06)}
+.panel h2{margin-top:0}
+.saved-list{margin-top:12px}
+
+/* Inputs inside app */
+.panel input, .panel textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #efe7c8;margin-top:8px}
+.panel textarea{min-height:100px;resize:vertical}
+
+/* saved items */
+.musica-item, .mus-item{background:#fff;border-radius:10px;padding:12px;margin-top:10px;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+.link-buttons{display:flex;gap:8px;margin-top:8px}
+
+/* BOTÕES COR */
+.btn.youtube{background:#FF0000;color:#fff}
+.btn.letra{background:#FFD700;color:#000}
+.btn.cifra{background:#4CAF50;color:#fff}
+
+/* share page */
+.share-top{padding:14px;background:linear-gradient(90deg,var(--accent),var(--accent-dark));color:#2b2200;font-weight:700}
+.share-main{padding:18px}

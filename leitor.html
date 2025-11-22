@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>LouvorIBI — App</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="app-bg">
+
+<header class="app-top">
+  <div class="left">
+    <img src="logo.png.png" class="app-logo" alt="logo">
+    <div class="brand">LouvorIBI</div>
+  </div>
+  <div class="right">
+    <span id="welcomeText">Seja bem-vindo</span>
+    <button class="btn small logout" id="btnLogout">Sair</button>
+  </div>
+</header>
+
+<main class="app-main">
+
+  <aside class="sidebar">
+    <button class="btn icon" id="btnNew">➕ Novo Repertório</button>
+    <button class="btn" id="btnSaved">📁 Repertórios Salvos</button>
+  </aside>
+
+  <section class="panel" id="panelNew" style="display:none;">
+    <h2>Novo Repertório</h2>
+
+    <label>Data do culto</label>
+    <input type="date" id="repDate">
+
+    <label>Música</label>
+    <input type="text" id="fieldMusic" placeholder="Nome da música">
+
+    <label>Tom</label>
+    <input type="text" id="fieldTom" placeholder="Tom (ex: A, C#)">
+
+    <label>Ministro(a)</label>
+    <input type="text" id="fieldMinister" placeholder="Ministro(a)">
+
+    <label>Link Letra (URL)</label>
+    <input type="text" id="fieldLyric" placeholder="https://...">
+
+    <label>Link Cifra (CifraClub)</label>
+    <input type="text" id="fieldCifra" placeholder="https://...">
+
+    <label>Link YouTube</label>
+    <input type="text" id="fieldYT" placeholder="https://...">
+
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button class="btn primary" id="btnSaveSong">Salvar música</button>
+      <button class="btn danger" id="btnClearSong">Limpar</button>
+    </div>
+  </section>
+
+  <section class="panel" id="panelSaved">
+    <h2>Repertório por data</h2>
+
+    <label>Selecione a data</label>
+    <input type="date" id="searchDate">
+
+    <div id="savedList" class="saved-list"></div>
+
+    <div style="margin-top:12px">
+      <button class="btn primary" id="btnShare">Compartilhar repertório (copiar link)</button>
+    </div>
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

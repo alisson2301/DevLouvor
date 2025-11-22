@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>LouvorIBI — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="login-bg">
+
+<div class="login-wrap">
+  <div class="login-card">
+    <img src="logo.png.png" alt="Logo" class="login-logo">
+    <h1 class="login-header">Login</h1>
+
+    <!-- LOGIN -->
+    <div id="loginBox">
+      <input id="loginUser" type="text" placeholder="Nome" autocomplete="username">
+      <input id="loginPass" type="password" placeholder="Senha" autocomplete="current-password">
+
+
+<p style="text-align:center; margin-top:5px;">
+  <a href="#" id="forgotPass" style="font-size:0.9em; color:#333;">Esqueci minha senha</a>
+</p>
+
+
+
+
+
+
+
+
+
+
+      
+      <button class="btn primary" id="btnLogin">Entrar</button>
+
+      <p class="small">Ainda não tem conta? <span class="link-like" id="showRegister">Cadastrar</span></p>
+    </div>
+
+    <!-- CADASTRO -->
+    <div id="registerBox" style="display:none;">
+      <input id="regUser" type="text" placeholder="Nome">
+      <input id="regPass" type="password" placeholder="Senha">
+      <button class="btn primary" id="btnRegister">Criar Conta</button>
+
+      <p class="small">Já tem conta? <span class="link-like" id="showLogin">Entrar</span></p>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
