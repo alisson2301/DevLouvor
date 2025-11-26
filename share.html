@@ -1,8 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LouvorIBI</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -23,12 +23,7 @@
   const repEncoded = qs.get('rep') || '';
   const titleCustom = qs.get('title') || 'LouvorIBI';
 
-  // ===========================
-  // CORREÇÃO DA DATA NO TÍTULO
-  // ===========================
-  // Espera receber algo como: LouvorIBI-07-12-2025
   let tituloFinal = titleCustom;
-
   if(titleCustom.includes("-")){
     const partes = titleCustom.split("-");
     if(partes.length >= 4){
@@ -36,7 +31,6 @@
       const dia  = partes[1];
       const mes  = partes[2];
       const ano  = partes[3];
-
       const dataFormatada = `${dia}/${mes}/${ano}`; 
       tituloFinal = `${nome} – ${dataFormatada}`;
     }
@@ -45,9 +39,6 @@
   document.title = tituloFinal;
   document.querySelector('.brand').textContent = tituloFinal;
 
-  // ===========================
-  // MOSTRAR O REPERTÓRIO
-  // ===========================
   const container = document.getElementById('shareList');
   container.innerHTML = '';
   try {
