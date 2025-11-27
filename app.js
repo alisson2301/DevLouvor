@@ -420,11 +420,12 @@ async function compartilharRepertorio() {
       createdAt: serverTimestamp()
     });
 
-    const url = `${location.origin}/share.html?id=${shortId}`;
+    const url = `${location.origin}/DevLouvor/share.html?id=${shortId}`;
     await navigator.clipboard.writeText(url);
     alert('Link curto copiado!\nCole e compartilhe: ' + url);
 
   } catch (e) {
     alert('Erro ao gerar link: ' + e.message);
   }
+
 }
