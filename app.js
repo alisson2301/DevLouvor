@@ -14,7 +14,10 @@ import {
   doc,
   getDoc,
   setDoc,
-  arrayUnion
+  arrayUnion,
+  collection,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ---------------------------
@@ -42,6 +45,8 @@ const db = getFirestore(app);
 window.editarMusica = editarMusica;
 window.excluirMusica = excluirMusica;
 window.compartilharRepertorio = compartilharRepertorio;
+window.toggleObsBox = toggleObsBox;
+window.viewObservacoes = viewObservacoes;
 
 /* ---------------------------
    DOM ready
@@ -140,8 +145,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnShare')?.addEventListener('click', compartilharRepertorio);
 
+    // Toggle obs button (exists in leitor.html UI)
+    document.getElementById('btnToggleObs')?.addEventListener('click', toggleObsBox);
+
     document.getElementById('panelNew').style.display = 'none';
     document.getElementById('panelSaved').style.display = 'block';
+
+    // Ensure the repDate change also loads possible observations when changing date while in New panel
+    document.getElementById('repDate')?.addEventListener('change', async () => {
+      const d = document.getElementById('repDate').value;
+      if (!d) return;
+      // load existing observations (if any)
+      const userId = getUserIdForPath();
+      if (!userId) return;
+      const docRef = doc(db, 'users', userId, 'repertorios', d);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const obs = docSnap.data().observacoes || '';
+        document.getElementById('fieldObs').value = obs;
+      } else {
+        document.getElementById('fieldObs').value = '';
+      }
+    });
   }
 });
 
@@ -178,23 +203,38 @@ async function salvarMusica() {
   const userId = getUserIdForPath();
   if (!userId) return location.href = 'index.html';
 
+  // Validação: todos os campos obrigatórios
   const data = document.getElementById('repDate')?.value;
   const musica = document.getElementById('fieldMusic')?.value.trim();
-  if (!data || !musica) return alert('Preencha data e música');
+  const tom = document.getElementById('fieldTom')?.value.trim();
+  const ministro = document.getElementById('fieldMinister')?.value.trim();
+  const letra = document.getElementById('fieldLyric')?.value.trim();
+  const cifra = document.getElementById('fieldCifra')?.value.trim();
+  const youtube = document.getElementById('fieldYT')?.value.trim();
+  const observacoes = document.getElementById('fieldObs')?.value.trim() || '';
+
+  if (!data) return alert('Preencha a data.');
+  if (!musica) return alert('Preencha o nome da música.');
+  if (!tom) return alert('Preencha o tom.');
+  if (!ministro) return alert('Preencha o ministro(a).');
+  if (!letra) return alert('Preencha o link da letra.');
+  if (!cifra) return alert('Preencha o link da cifra.');
+  if (!youtube) return alert('Preencha o link do YouTube.');
 
   const song = {
     musica,
-    tom: document.getElementById('fieldTom').value.trim(),
-    ministro: document.getElementById('fieldMinister').value.trim(),
-    letra: document.getElementById('fieldLyric').value.trim(),
-    cifra: document.getElementById('fieldCifra').value.trim(),
-    youtube: document.getElementById('fieldYT').value.trim(),
+    tom,
+    ministro,
+    letra,
+    cifra,
+    youtube,
     createdAt: new Date().toISOString()
   };
 
   try {
     const docRef = doc(db, 'users', userId, 'repertorios', data);
-    await setDoc(docRef, { songs: arrayUnion(song) }, { merge: true });
+    // salva song com arrayUnion e também salva observações no mesmo doc
+    await setDoc(docRef, { songs: arrayUnion(song), observacoes }, { merge: true });
     alert('Música salva!');
     ['fieldMusic','fieldTom','fieldMinister','fieldLyric','fieldCifra','fieldYT']
       .forEach(id => document.getElementById(id).value = '');
@@ -222,7 +262,18 @@ async function carregarRepertorio() {
     if (!docSnap.exists()) return container.innerHTML = '<p>Nenhum repertório nesta data.</p>';
 
     const songs = docSnap.data().songs || [];
+    const observacoes = docSnap.data().observacoes || '';
+
     if (songs.length === 0) return container.innerHTML = '<p>Nenhuma música salva.</p>';
+
+    // If there are observations, show a top button to view them
+    if (observacoes) {
+      const obsBtn = document.createElement('button');
+      obsBtn.className = 'btn small';
+      obsBtn.textContent = 'Observações';
+      obsBtn.addEventListener('click', () => viewObservacoes(observacoes));
+      container.appendChild(obsBtn);
+    }
 
     songs.forEach((it, idx) => {
       const div = document.createElement('div');
@@ -281,6 +332,11 @@ async function editarMusica(data, idx) {
   document.getElementById('fieldCifra').value = song.cifra;
   document.getElementById('fieldYT').value = song.youtube;
 
+  // load observations into textarea (if exist)
+  const observacoes = docSnap.data().observacoes || '';
+  document.getElementById('fieldObs').value = observacoes;
+
+  // remove the edited song from array and update
   songs.splice(idx, 1);
   await setDoc(docRef, { songs }, { merge: true });
 
@@ -306,6 +362,31 @@ async function excluirMusica(data, idx) {
 }
 
 /* =========================
+   Observações (UI helper)
+   ========================= */
+function toggleObsBox() {
+  const box = document.getElementById('obsBox');
+  if (!box) return;
+  box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+}
+
+function viewObservacoes(text) {
+  // show a modal-like box using prompt-like UI (but nicer)
+  const wrapper = document.createElement('div');
+  wrapper.className = 'obs-modal-backdrop';
+  wrapper.innerHTML = `
+    <div class="obs-modal">
+      <h3>Observações</h3>
+      <div class="obs-content"></div>
+      <button class="btn small close-obs">Fechar</button>
+    </div>
+  `;
+  document.body.appendChild(wrapper);
+  wrapper.querySelector('.obs-content').textContent = text || '(Sem observações)';
+  wrapper.querySelector('.close-obs').addEventListener('click', () => wrapper.remove());
+}
+
+/* =========================
    Função FINAL corrigida — COMPARTILHAR
    ========================= */
 async function compartilharRepertorio() {
@@ -324,13 +405,24 @@ async function compartilharRepertorio() {
 
   try {
     const songs = docSnap.data().songs;
-    const encoded = encodeURIComponent(JSON.stringify(songs));
+    const observacoes = docSnap.data().observacoes || '';
 
-    const base = location.origin + location.pathname.replace('/leitor.html', '');
-    const url = `${base}/share.html?rep=${encoded}&title=LouvorIBI-${data}`;
+    // Gera um id curto para compartilhar (ex: base36)
+    const shortId = Math.random().toString(36).substring(2, 9);
 
+    // Salva na coleção 'shared' um documento curto
+    const sharedRef = doc(db, 'shared', shortId);
+    await setDoc(sharedRef, {
+      owner: userId,
+      songs,
+      observacoes,
+      title: `Louvor&Adoração - ${data}`,
+      createdAt: serverTimestamp()
+    });
+
+    const url = `${location.origin}/share.html?id=${shortId}`;
     await navigator.clipboard.writeText(url);
-    alert('Link copiado!');
+    alert('Link curto copiado!\nCole e compartilhe: ' + url);
 
   } catch (e) {
     alert('Erro ao gerar link: ' + e.message);

@@ -17,50 +17,115 @@
   <div id="shareList"></div>
 </main>
 
-<script>
-(function(){
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Mesma configuração do app.js — mantenha sincronizado com seu projeto Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAcPkqOlLLqh2XVpkBj78absFAMLCkP8oU",
+  authDomain: "devlouvor.firebaseapp.com",
+  projectId: "devlouvor",
+  storageBucket: "devlouvor.firebasestorage.app",
+  messagingSenderId: "622416311876",
+  appId: "1:622416311876:web:bd8b2f3ebdf435aa5c6e11"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+(async function(){
   const qs = new URLSearchParams(location.search);
   const repEncoded = qs.get('rep') || '';
-  const titleCustom = qs.get('title') || 'LouvorIBI';
+  const shortId = qs.get('id') || '';
+  const container = document.getElementById('shareList');
+  container.innerHTML = '';
 
-  let tituloFinal = titleCustom;
-  if(titleCustom.includes("-")){
-    const partes = titleCustom.split("-");
-    if(partes.length >= 4){
-      const nome = partes[0];
-      const dia  = partes[1];
-      const mes  = partes[2];
-      const ano  = partes[3];
-      const dataFormatada = `${dia}/${mes}/${ano}`; 
-      tituloFinal = `${nome} – ${dataFormatada}`;
+  // prioridade: se passou id curto, buscar no Firestore 'shared' collection
+  if (shortId) {
+    try {
+      const docRef = doc(db, 'shared', shortId);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists()) {
+        container.innerHTML = '<p>Repertório compartilhado não encontrado.</p>';
+        return;
+      }
+      const data = docSnap.data();
+      document.title = data.title || 'Louvor&Adoração';
+      document.querySelector('.brand').textContent = document.title;
+
+      const songs = data.songs || [];
+      const observacoes = data.observacoes || '';
+
+      if (observacoes) {
+        const obsBtn = document.createElement('button');
+        obsBtn.className = 'btn small';
+        obsBtn.textContent = 'Observações';
+        obsBtn.addEventListener('click', () => {
+          alert(observacoes);
+        });
+        container.appendChild(obsBtn);
+      }
+
+      if (songs.length === 0) {
+        container.innerHTML += '<p>Nenhuma música neste repertório.</p>';
+        return;
+      }
+
+      songs.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'mus-item';
+        const esc = s => (s||'').toString().replaceAll('<','&lt;').replaceAll('>','&gt;');
+        div.innerHTML = `
+          <p><strong>Música:</strong> ${esc(item.musica)}</p>
+          <p><strong>Tom:</strong> ${esc(item.tom)}</p>
+          <p><strong>Ministro(a):</strong> ${esc(item.ministro)}</p>
+          <div class="link-buttons">
+            <button class="btn letra" onclick="window.open('${item.letra}','_blank')">Letra</button>
+            <button class="btn cifra" onclick="window.open('${item.cifra}','_blank')">Cifra</button>
+            <button class="btn youtube" onclick="window.open('${item.youtube}','_blank')">YouTube</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      return;
+    } catch (e) {
+      container.innerHTML = '<p>Erro ao carregar repertório compartilhado.</p>';
+      console.error(e);
+      return;
     }
   }
 
-  document.title = tituloFinal;
-  document.querySelector('.brand').textContent = tituloFinal;
+  // fallback: se recebeu rep via URL (antigo comportamento)
+  if (repEncoded) {
+    try {
+      const rep = JSON.parse(decodeURIComponent(repEncoded));
+      document.title = qs.get('title') || 'Louvor&Adoração';
+      document.querySelector('.brand').textContent = document.title;
 
-  const container = document.getElementById('shareList');
-  container.innerHTML = '';
-  try {
-    const rep = JSON.parse(decodeURIComponent(repEncoded));
-    rep.forEach(item=>{
-      const div = document.createElement('div');
-      div.className='mus-item';
-      div.innerHTML = `
-        <p><strong>Música:</strong> ${item.musica}</p>
-        <p><strong>Tom:</strong> ${item.tom}</p>
-        <p><strong>Ministro(a):</strong> ${item.ministro}</p>
-        <div class="link-buttons">
-          <button class="btn letra" onclick="window.open('${item.letra}','_blank')">Letra</button>
-          <button class="btn cifra" onclick="window.open('${item.cifra}','_blank')">Cifra</button>
-          <button class="btn youtube" onclick="window.open('${item.youtube}','_blank')">YouTube</button>
-        </div>
-      `;
-      container.appendChild(div);
-    });
-  } catch(e){
-    container.innerHTML = '<p>Não foi possível carregar o repertório.</p>';
+      rep.forEach(item=>{
+        const div = document.createElement('div');
+        div.className='mus-item';
+        div.innerHTML = `
+          <p><strong>Música:</strong> ${item.musica}</p>
+          <p><strong>Tom:</strong> ${item.tom}</p>
+          <p><strong>Ministro(a):</strong> ${item.ministro}</p>
+          <div class="link-buttons">
+            <button class="btn letra" onclick="window.open('${item.letra}','_blank')">Letra</button>
+            <button class="btn cifra" onclick="window.open('${item.cifra}','_blank')">Cifra</button>
+            <button class="btn youtube" onclick="window.open('${item.youtube}','_blank')">YouTube</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    } catch(e){
+      container.innerHTML = '<p>Não foi possível carregar o repertório.</p>';
+    }
+    return;
   }
+
+  container.innerHTML = '<p>Nenhum repertório especificado para exibição.</p>';
 })();
 </script>
 </body>

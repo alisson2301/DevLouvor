@@ -11,7 +11,7 @@
 
 <header class="app-top">
   <div class="left">
-    <img src="logo.png.png" class="app-logo">
+    <img src="logo.png.png" class="app-logo" alt="Logo">
     <div class="brand">LouvorIBI</div>
   </div>
   <div class="right">
@@ -28,15 +28,26 @@
 
   <div class="panel" id="panelNew">
     <h2>Novo Repertório</h2>
-    <input type="date" id="repDate">
-    <input type="text" id="fieldMusic" placeholder="Nome da Música">
-    <input type="text" id="fieldTom" placeholder="Tom">
-    <input type="text" id="fieldMinister" placeholder="Ministro(a)">
-    <input type="url" id="fieldLyric" placeholder="Link da Letra">
-    <input type="url" id="fieldCifra" placeholder="Link da Cifra">
-    <input type="url" id="fieldYT" placeholder="Link do YouTube">
-    <button id="btnSaveSong" class="btn primary">Salvar Música</button>
-    <button id="btnClearSong" class="btn small">Limpar</button>
+    <input type="date" id="repDate" required>
+
+    <input type="text" id="fieldMusic" placeholder="Nome da Música" required>
+    <input type="text" id="fieldTom" placeholder="Tom" required>
+    <input type="text" id="fieldMinister" placeholder="Ministro(a)" required>
+    <input type="url" id="fieldLyric" placeholder="Link da Letra" required>
+    <input type="url" id="fieldCifra" placeholder="Link da Cifra" required>
+    <input type="url" id="fieldYT" placeholder="Link do YouTube" required>
+
+    <div class="actions-row" style="margin-top:10px;display:flex;gap:8px;align-items:center">
+      <button id="btnSaveSong" class="btn primary">Salvar Música</button>
+      <button id="btnClearSong" class="btn small">Limpar</button>
+      <button id="btnToggleObs" class="btn small">Observações</button>
+    </div>
+
+    <div id="obsBox" style="display:none;margin-top:10px;">
+      <label for="fieldObs" style="font-weight:600;">Observações do repertório (salvas por data)</label>
+      <textarea id="fieldObs" placeholder="Escreva informações importantes sobre o repertório..."></textarea>
+      <p class="small">Observações são salvas automaticamente ao salvar uma música.</p>
+    </div>
   </div>
 
   <div class="panel" id="panelSaved">
